@@ -54,52 +54,8 @@ plt.tight_layout()
 plt.savefig('1_ultimos_10_años.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-# ============================================
-# GRÁFICO 2: Evolución histórica
-# ============================================
-print("Generando gráfico 2: Evolución histórica...")
-fig, ax = plt.subplots(figsize=(14, 6))
-ax.plot(nacional.index, nacional.values, linewidth=3, color='#e74c3c', marker='o', markersize=4)
-ax.fill_between(nacional.index, nacional.values, alpha=0.2, color='#e74c3c')
-ax.set_title('Evolución Histórica de Dengue en Costa Rica (1980-2024)', fontsize=16, fontweight='bold', pad=15)
-ax.set_ylabel('Número de Casos', fontsize=13, fontweight='bold')
-plt.tight_layout()
-plt.savefig('2_evolucion_historica.png', dpi=300, bbox_inches='tight')
-plt.close()
 
-# ============================================
-# GRÁFICO 3: Casos semanales 2024
-# ============================================
-print("Generando gráfico 3: Semanas 2024...")
-fig, ax = plt.subplots(figsize=(14, 6))
-sem_2024 = df_semanal[(df_semanal['Year'] == 2024) & (df_semanal['S_res'] == 'Admin0')].copy()
-sem_2024 = sem_2024.sort_values('calendar_start_date')
-sem_2024['semana'] = range(1, len(sem_2024) + 1)
-ax.plot(sem_2024['semana'], sem_2024['dengue_total'], linewidth=3, color='#3498db', marker='o', markersize=5)
-ax.fill_between(sem_2024['semana'], sem_2024['dengue_total'], alpha=0.2, color='#3498db')
-ax.set_title('Casos de Dengue por Semana - Costa Rica 2024', fontsize=16, fontweight='bold', pad=15)
-ax.set_xlabel('Semana del Año', fontsize=13, fontweight='bold')
-ax.set_ylabel('Número de Casos', fontsize=13, fontweight='bold')
-plt.tight_layout()
-plt.savefig('3_semanas_2024.png', dpi=300, bbox_inches='tight')
-plt.close()
 
-# ============================================
-# GRÁFICO 4: Top Provincias
-# ============================================
-print("Generando gráfico 4: Top provincias...")
-fig, ax = plt.subplots(figsize=(10, 6))
-prov_2018 = df_anual[(df_anual['Year'] == 2018) & (df_anual['S_res'] == 'Admin1')]
-if len(prov_2018) > 0:
-    top5 = prov_2018.groupby('adm_1_name')['dengue_total'].sum().sort_values().tail(5)
-    colores = ['#e74c3c', '#e67e22', '#f39c12', '#16a085', '#27ae60']
-    ax.barh(top5.index, top5.values, color=colores)
-    for i, v in enumerate(top5.values):
-        ax.text(v + 50, i, f'{int(v):,}', va='center', fontweight='bold', fontsize=11)
-    ax.set_title('Top 5 Provincias con Más Casos - 2018', fontsize=16, fontweight='bold', pad=15)
-    plt.tight_layout()
-    plt.savefig('4_top_provincias.png', dpi=300, bbox_inches='tight')
-plt.close()
 
 # ============================================
 # PREPARACIÓN DE DATOS MENSUALES (ESTACIONALIDAD)
@@ -122,58 +78,20 @@ dengue_mensual_real = df_semanal[df_semanal['S_res'] == 'Admin0'].groupby(['Year
 # Ahora promediamos por mes (Promedio histórico por mes)
 dengue_estacional = dengue_mensual_real.groupby('Month')['dengue_total'].mean()
 
-# ============================================
-# GRÁFICO 7 (REEMPLAZO): Patrón Estacional (Climograma)
-# ============================================
-print("Generando gráfico 7: Patrón Estacional (Climograma)...")
 
-fig, ax1 = plt.subplots(figsize=(14, 7))
+# ============================================
+# GRÁFICO 2: Tri-variado (Lluvia, Temp, Dengue)
+# ============================================
+print("Generando gráfico 2: Análisis Estacional Completo (3 variables)...")
 
 meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
-
-# Barras de Lluvia (Eje Izquierdo)
-color_lluvia = '#3498db' # Azul
-ax1.set_xlabel('Mes', fontsize=13, fontweight='bold')
-ax1.set_ylabel('Lluvia Promedio', color=color_lluvia, fontsize=13, fontweight='bold')
-# Usamos clima_mensual['Lluvia_Mes']
-bars = ax1.bar(meses, clima_mensual['Lluvia_Mes'], color=color_lluvia, alpha=0.5, label='Lluvia')
-ax1.tick_params(axis='y', labelcolor=color_lluvia)
-ax1.grid(False) # Quitar grid para limpieza visual
-
-# Línea de Dengue (Eje Derecho)
-ax2 = ax1.twinx()
-color_dengue = '#27ae60' # Verde
-ax2.set_ylabel('Promedio de Casos de Dengue', color=color_dengue, fontsize=13, fontweight='bold')
-# Usamos dengue_estacional
-line = ax2.plot(meses, dengue_estacional.values, color=color_dengue, linewidth=4, marker='o', markersize=8, label='Casos Dengue')
-ax2.tick_params(axis='y', labelcolor=color_dengue)
-ax2.grid(False)
-
-# Título explicativo
-plt.title('Patrón Estacional: ¿Cuándo llueve y cuándo hay Dengue?', 
-          fontsize=16, fontweight='bold', pad=20)
-
-# Añadir leyenda combinada
-lines1, labels1 = ax1.get_legend_handles_labels()
-lines2, labels2 = ax2.get_legend_handles_labels()
-ax2.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=12)
-
-plt.tight_layout()
-plt.savefig('7_correlacion_clima.png', dpi=300, bbox_inches='tight')
-print("✓ Guardado: 7_correlacion_clima.png (Reemplazado por Estacionalidad)")
-plt.close()
-
-# ============================================
-# GRÁFICO 8: Tri-variado (Lluvia, Temp, Dengue)
-# ============================================
-print("Generando gráfico 8: Análisis Estacional Completo (3 variables)...")
 
 fig, ax1 = plt.subplots(figsize=(14, 7))
 
 # Eje 1 (Izquierda): Lluvia (Barras)
 color_rain = '#3498db' # Azul
 ax1.set_xlabel('Mes del Año', fontsize=12, fontweight='bold')
-ax1.set_ylabel('Lluvia Promedio', color=color_rain, fontsize=12, fontweight='bold')
+ax1.set_ylabel('Lluvia Promedio Mensual (mm)', color=color_rain, fontsize=12, fontweight='bold')
 # Usamos clima_mensual['Lluvia_Mes']
 ax1.bar(meses, clima_mensual['Lluvia_Mes'], color=color_rain, alpha=0.3, label='Lluvia')
 ax1.tick_params(axis='y', labelcolor=color_rain)
@@ -209,12 +127,12 @@ custom_lines = [Line2D([0], [0], color=color_rain, lw=4, alpha=0.3),
 ax1.legend(custom_lines, ['Lluvia', 'Dengue', 'Temperatura'], loc='upper left')
 
 plt.tight_layout()
-plt.savefig('8_patron_estacional_completo.png', dpi=300, bbox_inches='tight')
-print("✓ Guardado: 8_patron_estacional_completo.png")
+plt.savefig('2_patron_estacional_completo.png', dpi=300, bbox_inches='tight')
+print("✓ Guardado: 2_patron_estacional_completo.png")
 plt.close()
 
 # ============================================
-# GRÁFICOS 5 y 6: Mantener Anuales (Actualizados)
+# GRÁFICOS 3 y 4: Mantener Anuales (Actualizados)
 # ============================================
 # Para los anuales, agrupamos el clima diario a anual
 clima_anual = df_clima.groupby('YEAR').agg({
@@ -229,8 +147,8 @@ dengue_anual_total.columns = ['Year', 'Casos_Dengue']
 
 datos_combinados = dengue_anual_total.merge(clima_anual, on='Year', how='inner')
 
-# Gráfico 5
-print("Generando gráfico 5: Dengue vs Temperatura...")
+# Gráfico 3
+print("Generando gráfico 3: Dengue vs Temperatura...")
 fig, ax1 = plt.subplots(figsize=(14, 6))
 color = '#27ae60' # Verde (Dengue)
 ax1.set_xlabel('Año', fontsize=13, fontweight='bold')
@@ -244,11 +162,11 @@ ax2.plot(datos_combinados['Year'], datos_combinados['Temperatura_Media'], color=
 ax2.tick_params(axis='y', labelcolor=color)
 plt.title('Relación Anual: Dengue vs Temperatura', fontsize=16, fontweight='bold', pad=15)
 plt.tight_layout()
-plt.savefig('5_dengue_vs_temperatura.png', dpi=300, bbox_inches='tight')
+plt.savefig('3_dengue_vs_temperatura.png', dpi=300, bbox_inches='tight')
 plt.close()
 
-# Gráfico 6
-print("Generando gráfico 6: Dengue vs Lluvia...")
+# Gráfico 4
+print("Generando gráfico 4: Dengue vs Lluvia...")
 fig, ax1 = plt.subplots(figsize=(14, 6))
 color = '#27ae60' # Verde (Dengue)
 ax1.set_xlabel('Año', fontsize=13, fontweight='bold')
@@ -262,12 +180,52 @@ ax2.plot(datos_combinados['Year'], datos_combinados['Lluvia_Anual'], color=color
 ax2.tick_params(axis='y', labelcolor=color)
 plt.title('Relación Anual: Dengue vs Lluvia', fontsize=16, fontweight='bold', pad=15)
 plt.tight_layout()
-plt.savefig('6_dengue_vs_lluvia.png', dpi=300, bbox_inches='tight')
+plt.savefig('4_dengue_vs_lluvia.png', dpi=300, bbox_inches='tight')
+plt.close()
+
+# ============================================
+# GRÁFICO 5: Dispersión Multivariable (Burbujas)
+# ============================================
+print("Generando gráfico 5: Dispersión Multivariable...")
+fig, ax = plt.subplots(figsize=(12, 8))
+
+# Normalizar tamaño de burbujas para que sean visibles pero no enormes
+# Factor de escala: ajustamos para que el máximo sea de un tamaño razonable
+max_casos = datos_combinados['Casos_Dengue'].max()
+sizes = (datos_combinados['Casos_Dengue'] / max_casos) * 2000 + 100
+
+scatter = ax.scatter(datos_combinados['Temperatura_Media'], 
+                     datos_combinados['Lluvia_Anual'], 
+                     s=sizes, 
+                     c=datos_combinados['Casos_Dengue'], 
+                     cmap='YlOrRd', 
+                     alpha=0.7, 
+                     edgecolors='grey', 
+                     linewidth=1)
+
+# Añadir etiquetas de año en cada burbuja
+for i, txt in enumerate(datos_combinados['Year']):
+    ax.annotate(txt, (datos_combinados['Temperatura_Media'].iloc[i], datos_combinados['Lluvia_Anual'].iloc[i]),
+                ha='center', va='center', fontsize=9, fontweight='bold')
+
+# Barra de color
+cbar = plt.colorbar(scatter)
+cbar.set_label('Número de Casos de Dengue', fontsize=12, fontweight='bold')
+
+ax.set_title('Relación Multivariable: Temperatura vs Lluvia vs Dengue (Tamaño)', fontsize=16, fontweight='bold', pad=15)
+ax.set_xlabel('Temperatura Media Anual (°C)', fontsize=13, fontweight='bold')
+ax.set_ylabel('Lluvia Anual Acumulada (mm)', fontsize=13, fontweight='bold')
+
+# Grid para facilitar lectura
+ax.grid(True, linestyle='--', alpha=0.5)
+
+plt.tight_layout()
+plt.savefig('5_dispersion_multivariable.png', dpi=300, bbox_inches='tight')
 plt.close()
 
 print("\n" + "="*70)
 print("RESUMEN FINAL")
 print("="*70)
 print("Se han generado todos los gráficos con la nueva data diaria de clima.")
-print("El Gráfico 7 ahora muestra el PATRÓN ESTACIONAL (Mes a Mes) para facilitar la explicación.")
-print("El Gráfico 8 incluye las 3 variables (Lluvia, Temp, Dengue) en un solo climograma.")
+print("El Gráfico 2 incluye las 3 variables (Lluvia, Temp, Dengue) en un solo climograma.")
+print("El Gráfico 5 muestra la dispersión multivariable (Burbujas).")
