@@ -20,12 +20,12 @@ A continuación se explica cómo leer e interpretar cada una de las visualizacio
 
 ### 📊 Gráfico 1: Casos de Dengue - Últimos 10 Años
 
-![Gráfico 1](ultima_decada.png)
+![Gráfico 1](1_ultima_decada.png)
 
   - Las barras más altas indican años epidémicos con brotes fuertes.
   - La barra roja resalta el año con el máximo histórico reciente.
   - Permite identificar rápidamente si la tendencia actual es al alza o a la baja.
-![Gráfico 1](1_ultima_decada.png)
+
 ### 🌦️ Gráfico 2: Patrón Estacional (Ciclo Anual)
 
 ![Gráfico 2](2_patron_estacional_completo.png)
