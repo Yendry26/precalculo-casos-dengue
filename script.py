@@ -51,7 +51,7 @@ for i, v in enumerate(ultimos_10.values):
 ax.set_title('Casos de Dengue en Costa Rica - Últimos 10 Años', fontsize=16, fontweight='bold', pad=15)
 ax.set_ylabel('Número de Casos', fontsize=13, fontweight='bold')
 plt.tight_layout()
-plt.savefig('1_ultimos_10_años.png', dpi=300, bbox_inches='tight')
+plt.savefig('1_ultima_decada.png', dpi=300, bbox_inches='tight')
 plt.close()
 
 
